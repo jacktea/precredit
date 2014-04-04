@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+		http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop-3.0.xsd 
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd ">
+
+	<aop:aspectj-autoproxy proxy-target-class="true"/>	
+
+
+
+	<util:properties id="configProperties" location="classpath:config.properties"></util:properties>
+
+	<!-- 扫描组件剔除springmvc部分 -->
+	<context:component-scan base-package="xg">
+		<context:exclude-filter expression="org.springframework.stereotype.Controller"
+			type="annotation" />
+	</context:component-scan>
+
+	<bean id="stat-filter" class="com.alibaba.druid.filter.stat.StatFilter">
+		<property name="slowSqlMillis" value="10000" />
+		<property name="logSlowSql" value="true" />
+	</bean>
+
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<property name="url"
+			value="#{configProperties['url']}" />
+		<property name="driverClassName" value="#{configProperties['driver']}" />
+		<property name="username" value="#{configProperties['user']}" />
+		<property name="password" value="#{configProperties['password']}" />
+		<property name="filters" value="slf4j"></property>
+		<property name="validationQuery" value="select 1"></property>
+		<property name="proxyFilters">
+			<list>
+				<ref bean="stat-filter" />
+			</list>
+		</property>
+	</bean>
+
+
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="packagesToScan" value="xg"></property>
+		<!-- <property name="persistenceUnitName" value="prameworkset-jpa"></property> 
+			<property name="persistenceXmlLocation" value="classpath*:META-INF/persistence.xml"></property> -->
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="showSql" value="true" />
+				<property name="database" value="MYSQL" />
+				<property name="generateDdl" value="true"></property>
+			</bean>
+		</property>
+	</bean>
+
+
+
+	<!-- 事物管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+	<!-- 用注解来实现事务管理 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	
+	
+	<bean id="combOfBusinessTypeService"
+		class="com.sunyard.frameworkset.service.BusinessTypeServiceImpl"></bean>
+	<bean id="treeNodeOfUserInfoService"
+		class="com.sunyard.frameworkset.service.TreeNodeOfUserInfoServiceImpl"></bean>
+
+	<bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
+		<property name="dataSource" ref="dataSource" />
+		<property name="databaseSchemaUpdate" value="true" />
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="jobExecutorActivate" value="true" />
+		<property name="history" value="full" />
+	</bean>
+	<bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
+		<property name="processEngineConfiguration" ref="processEngineConfiguration" />
+	</bean>
+	
+	<bean id="activitiCommonService" class="com.sunyard.frameworkset.workflow.service.CommonService">
+			<property name="commonDao">
+				<ref bean="commonDao" />
+			</property>
+	</bean>
+	
+	<bean id="processService"
+		class="com.sunyard.frameworkset.workflow.service.ProcessServiceImpl">
+		<property name="commonDao" ref="commonDao"></property>
+		<property name="commonService" ref="activitiCommonService">
+		</property>
+		<property name="repositoryService">
+			<bean id="repositoryService" factory-bean="processEngine"
+				factory-method="getRepositoryService" />
+		</property>
+		<property name="runtimeService">
+			<bean id="runtimeService" factory-bean="processEngine"
+				factory-method="getRuntimeService" />
+		</property>
+		<property name="taskService">
+			<bean id="taskService" factory-bean="processEngine"
+				factory-method="getTaskService" />
+		</property>
+		<property name="historyService">
+			<bean id="historyService" factory-bean="processEngine"
+				factory-method="getHistoryService" />
+		</property>
+		<property name="managementService">
+			<bean id="managementService" factory-bean="processEngine"
+				factory-method="getManagementService" />
+		</property>
+		<property name="identityService">
+			<bean id="identityService" factory-bean="processEngine"
+				factory-method="getIdentityService" />
+		</property>
+	</bean>
+	
+	
+	<bean id="workflowService"
+		class="com.sunyard.frameworkset.workflow.service.WorkflowServiceImp">
+		<property name="commonDao" ref="commonDao"></property>
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+		<property name="paginationBeanHelperTemplate" ref="paginationBeanHelperTemplate"></property>
+		<property name="processService" ref="processService"></property>
+		<property name="treeNodeOfUserInfoService" ref="treeNodeOfUserInfoService"></property>
+		<property name="combOfBusinessTypeService" ref="combOfBusinessTypeService"></property>
+	</bean>
+	<bean id="assigneeListener"
+		class="com.sunyard.frameworkset.workflow.service.AssigneeListener">
+		<property name="processService" ref="processService"></property>
+	</bean>
+	<bean id="completeListener"
+		class="com.sunyard.frameworkset.workflow.service.CompleteListener">
+		<property name="processService" ref="processService"></property>
+	</bean>
+	<bean id="sequenceFlowListener" 
+		class="com.sunyard.frameworkset.workflow.service.SequenceFlowListener">
+		<property name="processService" ref="processService"></property>
+	</bean>
+</beans>
