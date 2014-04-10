@@ -11,7 +11,7 @@ import xg.framework.querychannel.support.PagingParam;
 import xg.framework.web.controller.BaseController;
 import xg.framework.web.support.JsonFormResult;
 import xg.precredit.domain.Userinfo;
-import xg.precriedit.service.UserinfoService;
+import xg.precredit.service.UserinfoService;
 
 @Controller
 @RequestMapping("/userinfoController")
