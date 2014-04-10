@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import xg.framework.querychannel.QueryChannelService;
 import xg.framework.util.JacksonUtil;
-import xg.framework.web.JsonFormResult;
 import xg.framework.web.exception.JsonRespException;
+import xg.framework.web.support.JsonFormResult;
 
 public class BaseController {
 

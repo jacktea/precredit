@@ -1,4 +1,4 @@
-package xg.framework.web;
+package xg.framework.web.support;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -5,10 +5,11 @@ import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import xg.framework.domain.QuerySettings;
 import xg.framework.querychannel.support.GridData;
 import xg.framework.querychannel.support.PagingParam;
-import xg.framework.web.JsonFormResult;
 import xg.framework.web.controller.BaseController;
+import xg.framework.web.support.JsonFormResult;
 import xg.precredit.domain.Userinfo;
 import xg.precriedit.service.UserinfoService;
 
