@@ -44,6 +44,12 @@
 			<artifactId>druid</artifactId>
 			<version>0.2.25</version>
 		</dependency>
+		<!-- 数据库驱动 -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.19</version>
+		</dependency>
 		<!-- <dependency> <groupId>javax.persistence</groupId> <artifactId>persistence-api</artifactId> 
 			<version>2.0</version> </dependency> -->
 		<dependency>
