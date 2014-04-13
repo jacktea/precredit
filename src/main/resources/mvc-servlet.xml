@@ -16,14 +16,17 @@
     http://www.springframework.org/schema/util
 	http://www.springframework.org/schema/util/spring-util.xsd  ">
 	
-
-	<aop:aspectj-autoproxy proxy-target-class="true"/>	
-	
-	<mvc:view-controller path="/" view-name="index"/>
-  	<!-- 扫描设置 use-default-filters属性必须设置为false -->
+	<!-- 扫描设置 use-default-filters属性必须设置为false -->
 	<context:component-scan base-package="xg" use-default-filters="false">
 		<context:include-filter expression="org.springframework.stereotype.Controller" type="annotation"/>
 	</context:component-scan>
+
+	<aop:aspectj-autoproxy proxy-target-class="true"/>	
+	
+	<mvc:annotation-driven /> 
+	
+	<mvc:view-controller path="/" view-name="index"/>
+  	
 	
 	<mvc:resources location="/WEB-INF/js/,classpath:/META-INF/js/" mapping="/js/**" />
 	<mvc:resources location="/WEB-INF/images/,classpath:/META-INF/images/" mapping="/images/**"/>
