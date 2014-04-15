@@ -31,6 +31,7 @@
 	<mvc:resources location="/WEB-INF/js/,classpath:/META-INF/js/" mapping="/js/**" />
 	<mvc:resources location="/WEB-INF/images/,classpath:/META-INF/images/" mapping="/images/**"/>
 	<mvc:resources location="/WEB-INF/styles/,classpath:/META-INF/styles/" mapping="/styles/**"/>
+	<mvc:resources location="classpath:resources/" mapping="/resources/**" cache-period="30758400" />
 	
 	<bean id="multipartResolver" 
 		class="org.springframework.web.multipart.commons.CommonsMultipartResolver" 
